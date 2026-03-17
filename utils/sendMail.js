@@ -1,22 +1,23 @@
 import nodemailer from "nodemailer";
 
-const sendMail = async(to,subject,htmlContent)=>{
+const sendMail = async (to, subject, htmlContent) => {
     const transporter = nodemailer.createTransport({
-        host:"smtp.gmail.com",
+        host: "smtp.gmail.com",
         port: 587,
-        secure:false,
-        auth:{
-            user:process.env.EMAIL_USER,
-            pass:process.env.EMAIL_PASS,
+        secure: false,
+        family: 4,   // 👈 force IPv4
+        auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
         }
-    })
+    });
 
     await transporter.sendMail({
-        from: `"QuickPayQR" <${process.env.EMAIL_USER}> `,
+        from: `"QuickPayQR" <${process.env.EMAIL_USER}>`,
         to,
         subject,
-        html:htmlContent
-    })
-}
+        html: htmlContent
+    });
+};
 
 export default sendMail;
