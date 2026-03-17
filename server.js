@@ -14,7 +14,7 @@ mongoDB()
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
-app.use("/qrcodes", express.static("public/qrcodes"));
+app.use("/qrcodes", express.static(path.join(process.cwd(), "public/qrcodes")));
 app.use("/api/payments",paymentRoutes);
 app.use(errorHandler);
 
