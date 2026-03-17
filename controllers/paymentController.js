@@ -1,24 +1,22 @@
 import Payment from "../models/paymentModel.js";
 import sendMail from "../utils/sendMail.js";
 import QRCode from "qrcode";
-import path from "path";
+
 export const createPayment = async (req, res) => {
     try {
         const { name, amount, email } = req.body;
 
         const upiLink = `upi://pay?pa=venkatprashu008@ybl&pn=Prasad&am=${amount}&cu=INR&tn=${name.replace(/\s/g,"-")}`;
         const expiresAt = new Date(Date.now() + 60 * 60 * 1000);
-        const fileName = `${Date.now()}.png`;
-        const filePath = path.join(process.cwd(), "public", "qrcodes", fileName);
-        await QRCode.toFile(filePath,upiLink);
-        const qrUrl = `https://quickpayqrbackend.onrender.com/qrcodes/${fileName}`;
+
+        const qrCode = await QRCode.toDataURL(upiLink);
         const payment = await Payment.create({
         name,
         amount,
         email,
         upiLink,
-        qrCode:qrUrl,
-        expiresAt
+        qrCode,
+        expiresAt,
         });
 
         if (payment) {
@@ -32,7 +30,14 @@ export const createPayment = async (req, res) => {
 
                 <p>You need to pay <b>₹${amount}</b>.</p>
 
-                <p>Click the button below to scan & pay</p>
+                <p>Scan this QR to pay:</p>
+
+                <img src="${qrCode}" width="200"/>
+
+                <br/><br/>
+
+                <p>Or click the button below</p>
+
                 <a href="${payUrl}"
                 style="padding:10px 20px;background:green;color:white;text-decoration:none;border-radius:5px;">
                 Pay ₹${amount}
