@@ -11,7 +11,7 @@ export const createPayment = async (req, res) => {
         const fileName = `${Date.now()}.png`;
         const filePath = path.join(process.cwd(), "public", "qrcodes", fileName);
         await QRCode.toFile(filePath,upiLink);
-        const qrUrl = `https://griseous-radia-nonmortally.ngrok-free.dev/qrcodes/${fileName}`;
+        const qrUrl = `https://quickpayqrbackend.onrender.com/qrcodes/${fileName}`;
         const payment = await Payment.create({
         name,
         amount,
@@ -22,7 +22,7 @@ export const createPayment = async (req, res) => {
         });
 
         if (payment) {
-            const payUrl = `https://griseous-radia-nonmortally.ngrok-free.dev/api/payments/pay/${payment._id}`;
+            const payUrl = `https://quickpayqrbackend.onrender.com/api/payments/pay/${payment._id}`;
             try {
                 await sendMail(
                 email,
