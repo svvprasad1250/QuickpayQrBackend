@@ -26,25 +26,28 @@ export const createPayment = async (req, res) => {
                 email,
                 "Payment Request - QuickPayQR",
                 `
-                <h2>Hello ${name}👋</h2>
+                <div style="font-family:Arial;padding:20px">
+                <h2>Hello ${name} 👋</h2>
 
-                <p>You need to pay <b>₹${amount}</b>.</p>
+                <p>You need to pay <b>₹${amount}</b></p>
 
-                <p>Scan this QR to pay:</p>
+                <p>Scan this QR code to pay:</p>
 
-                <img src="${qrCode}" width="200"/>
+                <img src="cid:paymentqr" width="200" />
 
-                <br/><br/>
-
-                <p>Or click the button below</p>
+                <br><br>
 
                 <a href="${payUrl}"
-                style="padding:10px 20px;background:green;color:white;text-decoration:none;border-radius:5px;">
+                style="background:#16a34a;color:white;padding:12px 20px;text-decoration:none;border-radius:6px">
                 Pay ₹${amount}
                 </a>
 
-                <p>Thank you 🙏</p>
-                `
+                <p style="margin-top:20px;color:gray">
+                This payment link expires in 1 hour
+                </p>
+
+                </div>
+                `,qrCode
                 );
 
             } catch (err) {
