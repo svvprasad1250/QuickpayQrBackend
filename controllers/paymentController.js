@@ -83,17 +83,28 @@ export const payRedirect = async (req, res) => {
 
     <h2>Pay ₹${payment.amount}</h2>
 
-    <p>Scan QR to Pay</p>
+    <p><b>Scan this QR using any UPI app</b></p>
 
-    <img src="${payment.qrCode}" width="250"/>
+    <img id="qrImage" src="${payment.qrCode}" width="250"/>
 
     <br/><br/>
 
-    <a href="${payment.upiLink}"
-    style="padding:15px 25px;background:green;color:white;
-    text-decoration:none;border-radius:6px;font-size:18px;">
-    Open PhonePe / GPay
-    </a>
+    <button onclick="downloadQR()"
+    style="padding:12px 20px;background:blue;color:white;
+    border:none;border-radius:6px;font-size:16px;cursor:pointer;">
+    Download QR
+    </button>
+
+    <script>
+    function downloadQR() {
+        const link = document.createElement('a');
+        link.href = document.getElementById('qrImage').src;
+        link.download = 'payment-qr.png';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+    </script>
 
     </body>
     </html>
