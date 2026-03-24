@@ -6,10 +6,12 @@ export const createPayment = async (req, res) => {
     try {
         const { name, amount, email } = req.body;
 
-        const upiLink = `upi://pay?pa=venkatprashu008@ybl&pn=Prasad&am=${amount}&cu=INR&tn=${name.replace(/\s/g,"-")}`;
+        const upiLink = `upi://pay?pa=venkatprashu008@ybl&pn=Prasad&am=${amount}&cu=INR&tn=${name.replace(/\s/g, "-")}`;
+
         const expiresAt = new Date(Date.now() + 60 * 60 * 1000);
 
         const qrCode = await QRCode.toDataURL(upiLink);
+
         const payment = await Payment.create({
         name,
         amount,
@@ -20,44 +22,45 @@ export const createPayment = async (req, res) => {
         });
 
         if (payment) {
-            const payUrl = `https://quickpayqrbackend.onrender.com/api/payments/pay/${payment._id}`;
-            try {
-                await sendMail(
-                email,
-                "Payment Request - QuickPayQR",
-                `
-                <h2>Hello ${name}👋</h2>
+        const payUrl = `https://quickpayqrbackend.onrender.com/api/payments/pay/${payment._id}`;
 
-                <p>You need to pay <b>₹${amount}</b>.</p>
+        try {
+            await sendMail(
+            email,
+            "Payment Request - QuickPayQR",
+            `
+            <h2>Hello ${name} 👋</h2>
 
-                <p>Scan this QR to pay:</p>
+            <p>You need to pay <b>₹${amount}</b>.</p>
 
-                <img src="cid:paymentqr" width="200"/>
+            <p>Scan this QR to pay:</p>
 
-                <br/><br/>
+            <img src="cid:paymentqr" width="200"/>
 
-                <p>Or click the button below</p>
+            <br/><br/>
 
-                <a href="${payUrl}"
-                style="padding:10px 20px;background:green;color:white;text-decoration:none;border-radius:5px;">
-                Pay ₹${amount}
-                </a>
+            <p>Or click the button below</p>
 
-                <p>Thank you 🙏</p>
-                `,
-                qrCode
-                );
+            <a href="${payUrl}"
+            style="padding:12px 22px;background:green;color:white;text-decoration:none;border-radius:5px;">
+            Pay ₹${amount}
+            </a>
 
-            } catch (err) {
-                console.log("Email failed:", err.message);
-            }
+            <p>This payment link expires in 1 hour.</p>
 
-            res.status(201).json(payment);
+            <p>Thank you 🙏</p>
+            `,
+            qrCode
+            );
+        } catch (err) {
+            console.log("Email failed:", err.message);
         }
 
+        res.status(201).json(payment);
+        }
     } catch (error) {
-        res.status(500)
-        throw new Error("payment link generate fails")
+        console.error(error);
+        res.status(500).json({ message: "Payment link generation failed" });
     }
 };
 
@@ -70,9 +73,10 @@ export const payRedirect = async (req, res) => {
         return res.status(404).send("Payment not found");
     }
 
-    if(payment.expiresAt < new Date()){
-        return res.send("<h2>Payment Link expired...</h2>")
+    if (payment.expiresAt < new Date()) {
+        return res.send("<h2>Payment Link Expired</h2>");
     }
+
     res.send(`
     <html>
     <body style="text-align:center;margin-top:50px;font-family:sans-serif">
