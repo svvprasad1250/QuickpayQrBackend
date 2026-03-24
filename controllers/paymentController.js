@@ -45,7 +45,7 @@ export const createPayment = async (req, res) => {
 
                 <p>Thank you 🙏</p>
                 `,
-                qrcode
+                qrCode
                 );
 
             } catch (err) {

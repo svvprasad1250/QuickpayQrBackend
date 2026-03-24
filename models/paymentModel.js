@@ -9,10 +9,6 @@ const paymentSchema =new mongoose.Schema({
         type:Number,
         required:true
     },
-    phone:{
-        type:String,
-        required:true
-    },
     upiLink:{
         type:String
     },
