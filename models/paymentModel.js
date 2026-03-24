@@ -5,12 +5,12 @@ const paymentSchema =new mongoose.Schema({
         type:String,
         required:true
     },
-    email:{
-        type:String,
-        required:true
-    },
     amount:{
         type:Number,
+        required:true
+    },
+    phone:{
+        type:String,
         required:true
     },
     upiLink:{

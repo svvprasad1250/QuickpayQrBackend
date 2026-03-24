@@ -4,66 +4,45 @@ import QRCode from "qrcode";
 
 export const createPayment = async (req, res) => {
     try {
-        const { name, amount, email } = req.body;
+        const { name, amount, phone } = req.body;
 
         const upiLink = `upi://pay?pa=venkatprashu008@ybl&pn=Prasad&am=${amount}&cu=INR&tn=${name.replace(/\s/g,"-")}`;
+
         const expiresAt = new Date(Date.now() + 60 * 60 * 1000);
 
         const qrCode = await QRCode.toDataURL(upiLink);
+
         const payment = await Payment.create({
         name,
         amount,
-        email,
+        phone,
         upiLink,
         qrCode,
-        expiresAt,
+        expiresAt
         });
 
-        if (payment) {
-            const payUrl = `https://quickpayqrbackend.onrender.com/api/payments/pay/${payment._id}`;
-            try {
-                await sendMail(
-                email,
-                "Payment Request - QuickPayQR",
-                `
-                <div style="font-family:Arial;padding:20px">
-                <h2>Hello ${name} 👋</h2>
+        const payUrl = `https://quickpayqrbackend.onrender.com/api/payments/pay/${payment._id}`;
 
-                <p>You need to pay <b>₹${amount}</b></p>
+        // WhatsApp message
+        const message = encodeURIComponent(
+        `Hi ${name} 👋\n\nPlease pay ₹${amount}\n\nClick the link below to pay:\n${payUrl}\n\nThis link expires in 1 hour`
+        );
 
-                <p>Scan this QR code to pay:</p>
+        const whatsappLink = `https://wa.me/${phone}?text=${message}`;
 
-                <img src="cid:paymentqr" width="200" />
-
-                <br><br>
-
-                <a href="${payUrl}"
-                style="background:#16a34a;color:white;padding:12px 20px;text-decoration:none;border-radius:6px">
-                Pay ₹${amount}
-                </a>
-
-                <p style="margin-top:20px;color:gray">
-                This payment link expires in 1 hour
-                </p>
-
-                </div>
-                `,qrCode
-                );
-
-            } catch (err) {
-                console.log("Email failed:", err.message);
-            }
-
-            res.status(201).json(payment);
-        }
+        res.status(201).json({
+        payment,
+        payUrl,
+        whatsappLink
+        });
 
     } catch (error) {
-        res.status(500)
-        throw new Error("payment link generate fails")
+        res.status(500).json({ message: "Payment link generation failed" });
     }
 };
 
 export const payRedirect = async (req, res) => {
+
     const { id } = req.params;
 
     const payment = await Payment.findById(id);
@@ -72,9 +51,10 @@ export const payRedirect = async (req, res) => {
         return res.status(404).send("Payment not found");
     }
 
-    if(payment.expiresAt < new Date()){
-        return res.send("<h2>Payment Link expired...</h2>")
+    if (payment.expiresAt < new Date()) {
+        return res.send("<h2>Payment Link Expired</h2>");
     }
+
     res.send(`
     <html>
     <body style="text-align:center;margin-top:50px;font-family:sans-serif">
