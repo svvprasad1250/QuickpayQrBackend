@@ -8,7 +8,7 @@ export const createPayment = async (req, res) => {
 
         const upiLink = `upi://pay?pa=venkatprashu008@ybl&pn=Prasad&am=${amount}&cu=INR&tn=${name.replace(/\s/g, "-")}`;
 
-        const expiresAt = new Date(Date.now() + 60 * 60 * 1000);
+        const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
         const qrCode = await QRCode.toDataURL(upiLink);
 
@@ -46,7 +46,7 @@ export const createPayment = async (req, res) => {
             Pay ₹${amount}
             </a>
 
-            <p>This payment link expires in 1 hour.</p>
+            <p>This payment link expires in 24 hours.</p>
 
             <p>Thank you 🙏</p>
             `,
